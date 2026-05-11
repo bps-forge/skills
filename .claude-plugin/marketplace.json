@@ -11,6 +11,16 @@
         "./bps-forge-skills",
         "./example-skill"
       ]
+    },
+    {
+      "name": "bps-forge-engineering",
+      "source": "./",
+      "description": "Engineering skills: design, architecture, and codebase workflows",
+      "category": "engineering",
+      "version": "0.0.1",
+      "skills": [
+        "./responsibility-driven-design"
+      ]
     }
   ]
 }
