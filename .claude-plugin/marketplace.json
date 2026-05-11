@@ -1,0 +1,16 @@
+{
+  "name": "bps-forge",
+  "owner": { "name": "bps-forge" },
+  "plugins": [
+    {
+      "name": "bps-forge-skills",
+      "source": "./",
+      "description": "bps-forge skill collection",
+      "version": "0.0.1",
+      "skills": [
+        "./bps-forge-skills",
+        "./example-skill"
+      ]
+    }
+  ]
+}
