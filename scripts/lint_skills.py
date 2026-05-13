@@ -72,6 +72,13 @@ class MarketplaceRegistry:
                 dirs.add(Path(entry).name)
         return dirs
 
+    def register(self, skill_dir: str) -> None:
+        path = self._repo_root / ".claude-plugin" / "marketplace.json"
+        data = json.loads(path.read_text())
+        if data.get("plugins"):
+            data["plugins"][0].setdefault("skills", []).append(f"./{skill_dir}")
+        path.write_text(json.dumps(data))
+
 
 class ReadmeIndex:
     """Reads README.md and exposes its text for searching."""
@@ -81,6 +88,15 @@ class ReadmeIndex:
 
     def text(self) -> str:
         return (self._repo_root / "README.md").read_text()
+
+    def add_mention(self, skill_name: str) -> None:
+        path = self._repo_root / "README.md"
+        content = path.read_text()
+        if "## Skills" in content:
+            content = content.rstrip("\n") + f"\n- {skill_name}\n"
+        else:
+            content = content.rstrip("\n") + f"\n\n## Skills\n\n- {skill_name}\n"
+        path.write_text(content)
 
 
 class RegistrationCheck:
@@ -112,11 +128,17 @@ class LintRunner:
         registration: RegistrationCheck,
         mention: MentionCheck,
         out: TextIO,
+        fix_mode: bool = False,
+        registry: MarketplaceRegistry | None = None,
+        readme_index: ReadmeIndex | None = None,
     ) -> None:
         self._scanner = scanner
         self._registration = registration
         self._mention = mention
         self._out = out
+        self._fix_mode = fix_mode
+        self._registry = registry
+        self._readme_index = readme_index
 
     def run(self) -> int:
         violations = list(self._violations())
@@ -127,17 +149,33 @@ class LintRunner:
     def _violations(self) -> Iterator[str]:
         for skill in self._scanner.scan():
             if not self._registration.is_registered(skill):
-                yield f"{skill.dir_name}: not registered in marketplace.json"
+                if self._fix_mode and self._registry:
+                    self._registry.register(skill.dir_name)
+                else:
+                    yield f"{skill.dir_name}: not registered in marketplace.json"
             if not self._mention.is_mentioned(skill):
-                yield f"{skill.dir_name}: not mentioned in README.md"
+                if self._fix_mode and self._readme_index:
+                    self._readme_index.add_mention(skill.name)
+                else:
+                    yield f"{skill.dir_name}: not mentioned in README.md"
 
 
-def main(repo_root: Path, out: TextIO = sys.stdout) -> int:
+def main(repo_root: Path, out: TextIO = sys.stdout, fix: bool = False) -> int:
     scanner = SkillScanner(repo_root)
-    registration = RegistrationCheck(MarketplaceRegistry(repo_root).registered_dirs())
-    mention = MentionCheck(ReadmeIndex(repo_root).text())
-    return LintRunner(scanner, registration, mention, out).run()
+    registry = MarketplaceRegistry(repo_root)
+    readme_index = ReadmeIndex(repo_root)
+    registration = RegistrationCheck(registry.registered_dirs())
+    mention = MentionCheck(readme_index.text())
+    return LintRunner(
+        scanner, registration, mention, out,
+        fix_mode=fix, registry=registry, readme_index=readme_index,
+    ).run()
 
 
 if __name__ == "__main__":
-    sys.exit(main(Path(__file__).resolve().parent.parent))
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Lint skill registration and README mentions.")
+    parser.add_argument("--fix", action="store_true", help="Auto-fix violations instead of reporting them.")
+    args = parser.parse_args()
+    sys.exit(main(Path(__file__).resolve().parent.parent, fix=args.fix))
