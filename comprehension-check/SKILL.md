@@ -1,6 +1,6 @@
 ---
 name: comprehension-check
-description: Catch AI comprehension drift before the diff lands. After generating code with an AI, the author runs /comprehension-check on their latest diff. It asks three targeted questions — what the diff changes, why this approach won, and which line is most likely to break — and writes a report flagging lines the author could not explain. Mom Test rules apply: the questions ask what happened, not whether the author understands. Use when the user finishes an AI-generated diff and wants to verify they actually understand it before committing, mentions "comprehension drift", "/comprehension-check", "did I just commit something I don't understand", "AI drift", or wants to audit their own diff before push. **When to invoke:** after the AI produces a diff, before `git commit`.
+description: Catch AI comprehension drift before the diff lands. After generating code with an AI, the author runs /comprehension-check on their latest diff. It asks three targeted questions — what the diff changes, why this approach won, and which line is most likely to break — and writes a report flagging lines the author could not explain. Mom Test rules apply - the questions ask what happened, not whether the author understands. Use when the user finishes an AI-generated diff and wants to verify they actually understand it before committing, mentions "comprehension drift", "/comprehension-check", "did I just commit something I don't understand", "AI drift", or wants to audit their own diff before push. **When to invoke:** after the AI produces a diff, before `git commit`.
 ---
 
 <what-to-do>
@@ -135,9 +135,5 @@ The questions follow Mom Test rules: ask about the past, ask about specifics, ne
 - **Free-text answers only.** Structured input (dropdowns, line pickers) is easier to score but trains the author to game the probe. Free-text is honest and noisy. Score the first 5 installs manually.
 - **No PR integration.** The report is a local file. Posting to GitHub is a v1 feature; v0 is about whether the questions catch drift at all.
 - **No author config.** Three fixed questions, fixed order. If you let users skip questions, the ones who need them most will skip them.
-
-## Validation hook
-
-This skill is a validation probe — the canonical design doc lives in gstack at `~/.gstack/projects/bps-forge-skills/`. The success metric is not adoption — it is whether 2 of the first 5 real installs produce an unprompted "this caught X for me" message within 7 days. If it doesn't, the design is wrong, and the questions are the first thing to revisit.
 
 </supporting-info>
