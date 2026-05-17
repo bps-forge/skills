@@ -9,3 +9,4 @@ npx skills add bps-forge/skills
 ## Skills
 
 - responsibility-driven-design
+- comprehension-check
