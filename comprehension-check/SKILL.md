@@ -138,6 +138,6 @@ The questions follow Mom Test rules: ask about the past, ask about specifics, ne
 
 ## Validation hook
 
-This skill is a validation probe (see `PLAN.md` at repo root). The success metric is not adoption — it is whether 2 of the first 5 real installs produce an unprompted "this caught X for me" message within 7 days. If it doesn't, the design is wrong, and the questions are the first thing to revisit.
+This skill is a validation probe — the canonical design doc lives in gstack at `~/.gstack/projects/bps-forge-skills/`. The success metric is not adoption — it is whether 2 of the first 5 real installs produce an unprompted "this caught X for me" message within 7 days. If it doesn't, the design is wrong, and the questions are the first thing to revisit.
 
 </supporting-info>
